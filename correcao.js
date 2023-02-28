@@ -1,65 +1,48 @@
 const fs = require('fs');
 
-const getData = () => {
+const dataRecovery = () => {
 
-    fs.readFile('broken_database_1.json', 'utf-8', (err, data) => {
-        if(err){
-            console.log(err);
-            return;
-        }
-    
-        const dataFirstTable = JSON.parse(data);
-        console.log(dataFirstTable);
+    const getData = () => {
+        const data1 = fs.readFileSync('broken_database_1.json', 'utf-8');
+        const dataFirstTable = JSON.parse(data1);
+        //console.log(dataFirstTable);
 
-        const regexSubstituicao = /[æø]/g;
-        
-        const dataCorrected = dataFirstTable.map( element => {
-                const elementFixed = element['nome'].replace(regexSubstituicao, function(letra){
-                    switch (letra) {
-                        case 'æ':
-                          return 'a';
-                        case 'ø':
-                          return 'o';
-                    }
-                });
-                return elementFixed;
-            }
-        )
-        console.log(dataCorrected);
-
-        
-    })
-
-
-    fs.readFile('broken_database_2.json', 'utf-8', (err, data) => {
-        if(err){
-            console.log(err);
-            return;
-        }
-    
-        const dataSecondTable = JSON.parse(data);
-        console.log(dataSecondTable);
-        return dataSecondTable;
-    })
-
-    
-}
-
-getData();
+        const data2 = fs.readFileSync('broken_database_2.json', 'utf-8');
+        const dataSecondTable = JSON.parse(data2);
+        //console.log(dataSecondTable);
 
 
 
-
-
-/* const getData = async () => {
-    fetch('broken_database_1.json')
-        .then(response => response.json())
-        .then(data => {
-            dados = data;
-            console.log(data);
-        })
-        .catch(er => console.log(er));
+        return dataFirstTable;
     }
 
-getData(); */
 
+    const resetValuesNames = () => {
+        const regexLetters = /[æø]/g;
+        const dataFirstTable = getData();
+
+        for (let i = 0; i < dataFirstTable.length; i++) {
+            const nome = dataFirstTable[i].nome;
+            dataFirstTable[i].nome = nome.replace(regexLetters, letra => { 
+                    switch(letra) {
+                    case 'æ':
+                    return dataFirstTable[i].nome[0] === 'æ' ? 'A' : 'a';
+                    case 'ø':
+                    return dataFirstTable[i].nome[0] === 'ø' ? 'O' : 'o';
+                }
+            });
+        }
+
+        for (let i = 0; i < dataFirstTable.length; i++) {
+            dataFirstTable[i].vendas = parseInt(dataFirstTable[i].vendas);
+        }
+        console.log(dataFirstTable)
+        return dataFirstTable;
+    }
+
+    resetValuesNames()
+
+
+
+}
+dataRecovery();
