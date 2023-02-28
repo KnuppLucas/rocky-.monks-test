@@ -5,21 +5,16 @@ const dataRecovery = () => {
     const getData = () => {
         const data1 = fs.readFileSync('broken_database_1.json', 'utf-8');
         const dataFirstTable = JSON.parse(data1);
-        //console.log(dataFirstTable);
 
         const data2 = fs.readFileSync('broken_database_2.json', 'utf-8');
         const dataSecondTable = JSON.parse(data2);
-        //console.log(dataSecondTable);
-
-        
-
-        return dataFirstTable;
+        return [dataFirstTable, dataSecondTable];
     }
 
 
     const resetValuesNames = () => {
         const regexLetters = /[æø]/g;
-        const dataFirstTable = getData();
+        const [dataFirstTable, dataSecondTable] = getData();
 
         for (let i = 0; i < dataFirstTable.length; i++) {
             const nome = dataFirstTable[i].nome;
@@ -33,24 +28,42 @@ const dataRecovery = () => {
             });
         }
 
+        for (let i = 0; i < dataSecondTable.length; i++) {
+            const marca = dataSecondTable[i].marca;
+            dataSecondTable[i].marca = marca.replace(regexLetters, letra => { 
+                    switch(letra) {
+                    case 'æ':
+                    return dataSecondTable[i].marca[0] === 'æ' ? 'A' : 'a';
+                    case 'ø':
+                    return dataSecondTable[i].marca[0] === 'ø' ? 'O' : 'o';
+                }
+            });
+        }
+
         for (let i = 0; i < dataFirstTable.length; i++) {
             dataFirstTable[i].vendas = parseInt(dataFirstTable[i].vendas);
         }
-        console.log(dataFirstTable)
-        return dataFirstTable;
+        return [dataFirstTable, dataSecondTable];
     }
 
-    resetValuesNames()
+    resetValuesNames();
 
-    const rebuildDatabase = (data) => {
-        const dataJsonFormat = JSON.stringify(data)
-        fs.writeFile('database_1.json', dataJsonFormat, err => {
+    const rebuildDatabase = () => {
+        const [dataFirstTable, dataSecondTable] = resetValuesNames();
+
+        const dataJsonFormat1 = JSON.stringify(dataFirstTable)
+        fs.writeFile('database_1.json', dataJsonFormat1, err => {
             if (err) throw err;
-            console.log('Arquivo salvo!');
+            console.log('Arquivo salvo database_1!');
         })
-        return dataJsonFormat;
+
+        const dataJsonFormat2 = JSON.stringify(dataSecondTable)
+        fs.writeFile('database_2.json', dataJsonFormat2, err => {
+            if (err) throw err;
+            console.log('Arquivo salvo database_2!');
+        })
     }
 
-    console.log(rebuildDatabase(resetValuesNames()));
+    rebuildDatabase();
 }
 dataRecovery();
