@@ -11,7 +11,7 @@ const dataRecovery = () => {
         const dataSecondTable = JSON.parse(data2);
         //console.log(dataSecondTable);
 
-
+        
 
         return dataFirstTable;
     }
@@ -42,7 +42,15 @@ const dataRecovery = () => {
 
     resetValuesNames()
 
+    const rebuildDatabase = (data) => {
+        const dataJsonFormat = JSON.stringify(data)
+        fs.writeFile('database_1.json', dataJsonFormat, err => {
+            if (err) throw err;
+            console.log('Arquivo salvo!');
+        })
+        return dataJsonFormat;
+    }
 
-
+    console.log(rebuildDatabase(resetValuesNames()));
 }
 dataRecovery();
