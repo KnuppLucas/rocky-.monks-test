@@ -21,7 +21,7 @@ const getData = () => {
                         case 'ø':
                           return 'o';
                     }
-                });
+                });s
                 return elementFixed;
             }
         )
